@@ -2,11 +2,15 @@
   Start editing to see some magic happen :)
 </p>
 <div class="row">
-  <div class="form-group ">
+  <div class="form-group">
     <label class="control-label">
       Name
     </label>
-    <input class="form-control" type="text" [(ngModel)]='name' name="name" (change)="onChange($event)" />
     <p *ngIf=" info!== false"> Pleae Enter more than 2 letters </p>
+    <input class="form-control" type="text" [(ngModel)]='name' name="name" (change)="onChange($event)"
+      keyEnterListner />
+    <div *ngFor="let user of users">
+      {{user.DisplayText}}
+    </div>
   </div>
 </div>

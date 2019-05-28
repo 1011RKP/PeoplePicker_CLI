@@ -1,12 +1,16 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpRequest } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
+import { catchError, map, tap, mergeMap } from 'rxjs/operators';
 import { PeoplePickerQuery } from "./Model/App.Model";
+import { FormDigestResponse } from './Model/App.Response';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json', 'Accept': 'application/json;odata=verbose' })
 };
+
+const PEOPLE_PICKER_URL =
+  '/_api/SP.UI.ApplicationPages.ClientPeoplePickerWebServiceInterface.ClientPeoplePickerSearchUser';
 
 @Injectable()
 export class AppService {
@@ -16,24 +20,6 @@ export class AppService {
 
   constructor(
     private _http: HttpClient) { }
-
-  public getUserSuggestions(url: string, jsonBody: any, res: any): Observable<any> {
-    const httpOptions1 = {
-      headers: new HttpHeaders()
-        .set('Content-Type', 'application/json')
-        .set('Accept', 'application/json;odata=verbose')
-        .set('X-HTTP-Method', 'MERGE')
-        .set('If-Match', '*')
-        .set('X-RequestDigest', res)
-    };
-    const httpURL = this.siteURL + url;
-    const data = JSON.stringify(jsonBody);
-    return this._http.post<any>(httpURL, data, httpOptions1).pipe(
-      tap(httpres => this.log('Fetched Data')),
-      catchError(this.handleError('addListItem', []))
-    );
-
-  }
 
   private handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
@@ -52,11 +38,25 @@ export class AppService {
     console.log('AppService: ' + message);
   }
 
-  getService(): Observable<any> {
+  getUserSuggestions(query: PeoplePickerQuery): Observable<any> {
     const appweburl = this.siteURL + '/_api/contextinfo';
-    return this._http.post<any>(appweburl, {}, httpOptions).pipe(
-      tap(data => this.log('Fetched RequestDigest')),
-      catchError(this.handleError('getService', []))
+    const httpURL = this.siteURL + PEOPLE_PICKER_URL;
+    //const data = JSON.stringify(query);
+    return this._http.post(appweburl, '').pipe(
+      mergeMap((xRequest: FormDigestResponse) => {
+        const digest = xRequest.FormDigestValue;
+        const headers = new HttpHeaders({
+          accept: 'application/json;odata=verbose',
+          'X-RequestDigest': digest
+        });
+        const httpOptions = {
+          headers: headers
+        };
+        return this._http.post(httpURL, query, httpOptions).pipe(
+          tap(httpres => this.log('Fetched Data')),
+          catchError(this.handleError('Get Users', []))
+        );
+      })
     );
   }
 }
