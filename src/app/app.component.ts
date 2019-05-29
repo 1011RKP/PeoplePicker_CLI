@@ -11,6 +11,7 @@ import { HttpClient, HttpHeaders, HttpRequest } from '@angular/common/http';
 export class AppComponent implements OnInit {
   name: string = 'Angular';
   info: boolean = false;
+  displayUsersList: boolean = false;
   public users: PeoplePickerUser[];
 
   peoplePickerQuery: PeoplePickerQuery = {
@@ -33,6 +34,12 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.users = [];
+  }
+
+  selectedUser(res): void {
+    console.log(res);
+    this.name = res.DisplayText;
+    this.displayUsersList = false;
   }
 
 
@@ -58,6 +65,8 @@ export class AppComponent implements OnInit {
           allUsers.forEach(user => {
             this.users = [...this.users, user];
           });
+          this.displayUsersList = true;
+          console.log(this.users);
         },
         (error) => {
           console.log(error);

@@ -6,6 +6,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppComponent } from './app.component';
 import { AppService } from "./app.service";
 import { EnterCatcher } from './Directive/HostListener.directive';
+import { AngularFontAwesomeModule } from 'angular-font-awesome';
+
 
 @NgModule({
   declarations: [
@@ -17,6 +19,7 @@ import { EnterCatcher } from './Directive/HostListener.directive';
     FormsModule,
     HttpClientModule,
     BrowserAnimationsModule,
+    AngularFontAwesomeModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [AppService],
